@@ -34,6 +34,11 @@ namespace JHServer.Models
 
         public int? incomingqty { get; set; }
 
+        //add by xue lei on 2018-10-15
+        public sbyte? result { get; set; }
+
+        
+
         [StringLength(20)]
         public string createuser { get; set; }
     }
