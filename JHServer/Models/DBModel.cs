@@ -15,6 +15,7 @@ namespace JHServer.Models
         public virtual DbSet<tiqclog> tiqclogs { get; set; }
         public virtual DbSet<tpackinginfo> tpackinginfoes { get; set; }
         public virtual DbSet<tiqcdetaillog> tiqcdetaillogs { get; set; }
+        public virtual DbSet<tiqcdetailresultlog> tiqcdetailresultlogs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -163,6 +164,18 @@ namespace JHServer.Models
                 .IsUnicode(false);
 
             modelBuilder.Entity<tiqcdetaillog>()
+                .Property(e => e.result)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<tiqcdetailresultlog>()
+                .Property(e => e.lot)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<tiqcdetailresultlog>()
+                .Property(e => e.paraid)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<tiqcdetailresultlog>()
                 .Property(e => e.result)
                 .IsUnicode(false);
         }

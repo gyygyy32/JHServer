@@ -45,32 +45,44 @@ namespace JHServer.WebApi
         {
             using (var context = new DBModel())
             {
+                var iqcdetailresultlog = new tiqcdetailresultlog
+                {
+                    id = 1,
+                    lot = "a",
+                    paraid = "a",
+                    result = "a",
+                    no = 2
+                };
+                context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                context.SaveChanges();
+
+                return null;
+
                 //dynamic where clause
                 var query141 = context.tiqclogs.AsQueryable();
 
-
                 //var con = new EntityConnection("name=SchoolDBEntities");
                 //linq
-                var data = context.tiqclogs.Join(context.tiqcdetaillogs, a => a.id, g => g.id,(a, g) => new { a.incomingno,a.incomingqty,a.inspectiontime,a.length,a.materialtype,a.pinmin,a.result,a.supplycompany,a.thinkness,a.width,a.createuser,g.lot});
-                var resdata =data;
+                var data = context.tiqclogs.Join(context.tiqcdetaillogs, a => a.id, g => g.id, (a, g) => new { a.incomingno, a.incomingqty, a.inspectiontime, a.length, a.materialtype, a.pinmin, a.result, a.supplycompany, a.thinkness, a.width, a.createuser, g.lot });
+                var resdata = data;
                 if (!string.IsNullOrEmpty(para.bt.ToString()) && !string.IsNullOrEmpty(para.et.ToString()))
                 {
                     DateTime bt = (DateTime)para.bt;
                     DateTime et = (DateTime)para.et;
                     resdata = data.Where(c => c.inspectiontime >= bt && c.inspectiontime <= et);
                 }
-                
-                if (!string.IsNullOrEmpty(para.incomingno.ToString())) { string incomingno = para.incomingno.ToString(); resdata= resdata.Where(c => c.incomingno == incomingno); }
+
+                if (!string.IsNullOrEmpty(para.incomingno.ToString())) { string incomingno = para.incomingno.ToString(); resdata = resdata.Where(c => c.incomingno == incomingno); }
                 if (!string.IsNullOrEmpty(para.supplycompany.ToString())) { string supplycompany = (string)para.supplycompany; resdata = resdata.Where(c => c.supplycompany == supplycompany); }
-                if (!string.IsNullOrEmpty((string)para.materialtype)) { string materialtype = (string)para.materialtype; resdata=resdata.Where(c => c.materialtype == materialtype); }
-                if (!string.IsNullOrEmpty(para.result.ToString())) { sbyte result = (sbyte)para.result; resdata = resdata.Where(c => c.result == result); }
+                if (!string.IsNullOrEmpty((string)para.materialtype)) { string materialtype = (string)para.materialtype; resdata = resdata.Where(c => c.materialtype == materialtype); }
+                if (!string.IsNullOrEmpty(para.result.ToString())) { bool result = (Int16)para.result == 1 ? true : false; resdata = resdata.Where(c => c.result == result); }
                 if (!string.IsNullOrEmpty(para.lot.ToString())) { string lot = (string)para.result; resdata = resdata.Where(c => c.lot == lot); }
                 if (!string.IsNullOrEmpty(para.pinmin.ToString())) { string pinmin = (string)para.pinmin; resdata = resdata.Where(c => c.pinmin == pinmin); }
 
-                var resfinal= resdata.Select(a => new { a.incomingno, a.incomingqty, a.inspectiontime, a.length, a.materialtype,a.pinmin,a.result,a.supplycompany,a.thinkness,a.width }).Distinct();
-                
-                var json = Json(resfinal.ToList());
+                var resfinal = resdata.Select(a => new { a.incomingno, a.incomingqty, a.inspectiontime, a.length, a.materialtype, a.pinmin, a.result, a.supplycompany, a.thinkness, a.width }).Distinct();
 
+                var json = Json(resfinal.ToList());
 
                 return json;
             }
@@ -98,8 +110,8 @@ namespace JHServer.WebApi
             {
                 using (var dbContextTransaction = context.Database.BeginTransaction())
                 {
-                    try
-                    {
+                    //try
+                    //{
                         //insert mianformdata
                         var iqclog = new tiqclog
                         {
@@ -113,7 +125,7 @@ namespace JHServer.WebApi
                             length = Convert.ToInt32(mainformdata.txtLength),
                             incomingqty = Convert.ToInt32(mainformdata.txtDeliveryQty),
                             createuser = para.userid.ToString(),
-                            result = Convert.ToSByte(para.result)
+                            result = Convert.ToInt16(para.result) == 1 ? true : false
                         };
                         context.tiqclogs.Add(iqclog);
                         context.SaveChanges();
@@ -125,30 +137,88 @@ namespace JHServer.WebApi
                             //var iqcdetaillog = new tiqcdetaillog();
                             foreach (KeyValuePair<string, object> kvp in item)
                             {
+
+                                long tempid;
+                                string templot;
+                                string tempsublot;
+                                int tempno;
+                                string result;
+
+                                tempid = detailtableid;
+                                templot = (string)mainformdata.txtIncomingNo;
+                                //tempsublot = kvp.Value.ToString();
+                                tempno = Convert.ToInt32(Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""));
+                                var detailresult = db.tiqcdetailresultlogs.SingleOrDefault(e => e.id == tempid && e.lot == templot && e.no == tempno);
                                 var a = kvp;
-                                var iqcdetaillog = new tiqcdetaillog
+                                if (kvp.Key.ToString().Contains("Result"))
                                 {
-                                    id = detailtableid,
-                                    lot = (string)mainformdata.txtIncomingNo,
-                                    paratype = kvp.Key.ToString(),
-                                    paraid = kvp.Value.ToString(),
-                                    parasubtype = Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""),
-                                };
-                                context.tiqcdetaillogs.Add(iqcdetaillog);
+                                    //var resultresult = db.tiqcdetailresultlogs.SingleOrDefault(e => e.id == tempid && e.lot == templot && e.no == tempno);
+                                    //if (detailresult != null)
+                                    //{
+                                    //    detailresult.result = kvp.Value.ToString();
+                                    //}
+                                    //else
+                                    {
+                                        var iqcdetailresultlog = new tiqcdetailresultlog
+                                        {
+                                            id = tempid,
+                                            lot = templot,
+                                            paraid = kvp.Key.ToString(),
+                                            result = kvp.Value.ToString(),
+                                            no = tempno
+                                        };
+                                        context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                                    }
+                                    //context.SaveChanges();
+                                }
+                                //保存抽检子批次号
+                                else if (kvp.Key.ToString().Contains("txtLot"))
+                                {    
+                                    ////===================批次已经记录============================
+                                    //if (detailresult != null)
+                                    //{
+                                    //    detailresult.sublot = tempsublot;
+                                    //}
+                                    //else //===============批次还没记录============================
+                                    //{
+                                    //    var iqcdetailresultlog = new tiqcdetailresultlog
+                                    //    {
+                                    //        id = tempid,
+                                    //        lot = templot,
+                                    //        //paraid = kvp.Key.ToString(),
+                                    //        sublot = kvp.Value.ToString(),
+                                    //        no = tempno
+                                    //    };
+                                    //    context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                                    //}
+                                    //context.SaveChanges();
+                                }
+                                //保存检验内容
+                                else
+                                {
+                                    var iqcdetaillog = new tiqcdetaillog
+                                    {
+
+                                        id = detailtableid,
+                                        lot = (string)mainformdata.txtIncomingNo,
+                                        paratype = kvp.Key.ToString(),
+                                        paraid = kvp.Value.ToString(),
+                                        parasubtype = Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""),
+                                    };
+                                    context.tiqcdetaillogs.Add(iqcdetaillog);
+                                }
                             }
                         }
                         context.SaveChanges();
                         dbContextTransaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        dbContextTransaction.Rollback();
-                        return Json(new { result = "fail", msg = "" });
-                    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    dbContextTransaction.Rollback();
+                    //    return Json(new { result = "fail", msg = "" });
+                    //}
                 }
             }
-
-
             //dynamic formdata = new ExpandoObject();
             //var dic = (IDictionary<string, object>)formdata;
             ////遍历json数组
