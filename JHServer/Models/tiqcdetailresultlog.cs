@@ -9,20 +9,19 @@ namespace JHServer.Models
     [Table("jh_mes.tiqcdetailresultlog")]
     public partial class tiqcdetailresultlog
     {
-        
-        [Column(Order = 0)]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key]
+        public long primaryid { get; set; }
+
         public long id { get; set; }
 
-        
-        [Column(Order = 1)]
+        [Required]
         [StringLength(40)]
         public string lot { get; set; }
 
-        [StringLength(40)]       
+        [StringLength(40)]
         public string sublot { get; set; }
 
-        public int no { get; set; }
+        public int? no { get; set; }
 
         [StringLength(40)]
         public string paraid { get; set; }

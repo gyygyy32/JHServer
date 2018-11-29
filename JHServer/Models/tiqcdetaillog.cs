@@ -32,5 +32,8 @@ namespace JHServer.Models
 
         [StringLength(40)]
         public string result { get; set; }
+
+        [StringLength(40)]
+        public string sublot { get; set; }
     }
 }

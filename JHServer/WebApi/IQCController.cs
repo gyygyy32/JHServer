@@ -45,19 +45,19 @@ namespace JHServer.WebApi
         {
             using (var context = new DBModel())
             {
-                var iqcdetailresultlog = new tiqcdetailresultlog
-                {
-                    id = 1,
-                    lot = "a",
-                    paraid = "a",
-                    result = "a",
-                    no = 2
-                };
-                context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
-                context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
-                context.SaveChanges();
+                //var iqcdetailresultlog = new tiqcdetailresultlog
+                //{
+                //    id = 1,
+                //    lot = "a",
+                //    paraid = "a",
+                //    result = "a",
+                //    no = 2
+                //};
+                //context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                //context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
+                //context.SaveChanges();
 
-                return null;
+                //return null;
 
                 //dynamic where clause
                 var query141 = context.tiqclogs.AsQueryable();
@@ -110,8 +110,8 @@ namespace JHServer.WebApi
             {
                 using (var dbContextTransaction = context.Database.BeginTransaction())
                 {
-                    //try
-                    //{
+                    try
+                    {
                         //insert mianformdata
                         var iqclog = new tiqclog
                         {
@@ -131,24 +131,22 @@ namespace JHServer.WebApi
                         context.SaveChanges();
 
                         long detailtableid = iqclog.id;
+                        long tempid;
+                        string templot;
+                        tempid = detailtableid;
+                        templot = (string)mainformdata.txtIncomingNo;
                         //insert subformdata
                         foreach (var item in submainList)
                         {
                             //var iqcdetaillog = new tiqcdetaillog();
                             foreach (KeyValuePair<string, object> kvp in item)
-                            {
-
-                                long tempid;
-                                string templot;
+                            {                               
                                 string tempsublot;
                                 int tempno;
                                 string result;
-
-                                tempid = detailtableid;
-                                templot = (string)mainformdata.txtIncomingNo;
                                 //tempsublot = kvp.Value.ToString();
                                 tempno = Convert.ToInt32(Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""));
-                                var detailresult = db.tiqcdetailresultlogs.SingleOrDefault(e => e.id == tempid && e.lot == templot && e.no == tempno);
+                                //var detailresult = db.tiqcdetailresultlogs.SingleOrDefault(e => e.id == tempid && e.lot == templot && e.no == tempno);
                                 var a = kvp;
                                 if (kvp.Key.ToString().Contains("Result"))
                                 {
@@ -162,10 +160,10 @@ namespace JHServer.WebApi
                                         var iqcdetailresultlog = new tiqcdetailresultlog
                                         {
                                             id = tempid,
-                                            lot = templot,
-                                            paraid = kvp.Key.ToString(),
-                                            result = kvp.Value.ToString(),
-                                            no = tempno
+                                            lot = templot,//进料单号
+                                            paraid = kvp.Key.ToString(),//检验类型
+                                            result = kvp.Value.ToString(),//检验结果
+                                            no = tempno //第几个批次
                                         };
                                         context.tiqcdetailresultlogs.Add(iqcdetailresultlog);
                                     }
@@ -173,7 +171,7 @@ namespace JHServer.WebApi
                                 }
                                 //保存抽检子批次号
                                 else if (kvp.Key.ToString().Contains("txtLot"))
-                                {    
+                                {
                                     ////===================批次已经记录============================
                                     //if (detailresult != null)
                                     //{
@@ -206,17 +204,39 @@ namespace JHServer.WebApi
                                         parasubtype = Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""),
                                     };
                                     context.tiqcdetaillogs.Add(iqcdetaillog);
+
                                 }
                             }
+                            context.SaveChanges();
+
+                            // insert sublot into db
+                            foreach (KeyValuePair<string, object> kvp in item)
+                            {
+                                //保存抽检子批次号
+                                 if (kvp.Key.ToString().Contains("txtLot"))
+                                {
+                                    int tempno = Convert.ToInt32(Regex.Replace(kvp.Key.ToString(), @"[^\d.\d]", ""));
+                                    var res = context.tiqcdetaillogs.Where(a => a.id == tempid && a.parasubtype == tempno.ToString() && a.lot == templot).ToList();
+                                    res.ForEach(a => a.sublot = kvp.Value.ToString());
+
+                                    var detailres = context.tiqcdetailresultlogs.Where(a => a.id == tempid && a.lot == templot && a.no == tempno).ToList();
+                                    detailres.ForEach(a => a.sublot = kvp.Value.ToString());
+                                   
+                                }
+                                context.SaveChanges();
+                            }
+
+
+
                         }
-                        context.SaveChanges();
+                        
                         dbContextTransaction.Commit();
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    dbContextTransaction.Rollback();
-                    //    return Json(new { result = "fail", msg = "" });
-                    //}
+                    }
+                    catch (Exception ex)
+                    {
+                        dbContextTransaction.Rollback();
+                        return Json(new { result = "fail", msg = "" });
+                    }
                 }
             }
             //dynamic formdata = new ExpandoObject();

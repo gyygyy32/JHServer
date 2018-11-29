@@ -17,6 +17,7 @@ namespace JHServer.Models
         public virtual DbSet<tiqcdetaillog> tiqcdetaillogs { get; set; }
         public virtual DbSet<tiqcdetailresultlog> tiqcdetailresultlogs { get; set; }
 
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<tiqclog>()
@@ -166,9 +167,15 @@ namespace JHServer.Models
             modelBuilder.Entity<tiqcdetaillog>()
                 .Property(e => e.result)
                 .IsUnicode(false);
+            modelBuilder.Entity<tiqcdetaillog>()
+                .Property(e => e.sublot)
+                .IsUnicode(false);
+            modelBuilder.Entity<tiqcdetailresultlog>()
+               .Property(e => e.lot)
+               .IsUnicode(false);
 
             modelBuilder.Entity<tiqcdetailresultlog>()
-                .Property(e => e.lot)
+                .Property(e => e.sublot)
                 .IsUnicode(false);
 
             modelBuilder.Entity<tiqcdetailresultlog>()
@@ -178,6 +185,7 @@ namespace JHServer.Models
             modelBuilder.Entity<tiqcdetailresultlog>()
                 .Property(e => e.result)
                 .IsUnicode(false);
+
         }
     }
 }

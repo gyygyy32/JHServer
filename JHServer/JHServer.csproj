@@ -204,9 +204,14 @@
     </Compile>
     <Compile Include="Models\DBModel.cs" />
     <Compile Include="Models\DBModel1.cs" />
+    <Compile Include="Models\jsModel.cs" />
     <Compile Include="Models\Model1.cs" />
     <Compile Include="Models\Model2.cs" />
     <Compile Include="Models\Model3.cs" />
+    <Compile Include="Models\Model4.cs" />
+    <Compile Include="Models\rt_mid_flash_label.cs" />
+    <Compile Include="Models\rt_mid_packing.cs" />
+    <Compile Include="Models\rt_pallet_info.cs" />
     <Compile Include="Models\tiqcdetaillog.cs" />
     <Compile Include="Models\tiqcdetailresultlog.cs" />
     <Compile Include="Models\tiqclog.cs" />
@@ -216,6 +221,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\IQCService.cs" />
     <Compile Include="WebApi\IQCController.cs" />
+    <Compile Include="WebApi\jsmes\rt_pallet_infoController.cs" />
     <Compile Include="WebApi\tiqclogsController.cs" />
     <Compile Include="WebApi\tparaconfigsController.cs" />
   </ItemGroup>
